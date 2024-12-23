@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: frontend-rollout
+spec:
+  replicas: 3
+  strategy:
+    canary:
+      steps:
+      - setWeight: 20
+      - pause: {duration: 1h}
+      - setWeight: 40
+      - pause: {duration: 1h}
+      - setWeight: 60
+      - pause: {duration: 1h}
+      - setWeight: 80
+      - pause: {duration: 1h}
+  revisionHistoryLimit: 2
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: credit-score-frontend:v1
+        ports:
+        - containerPort: 80
